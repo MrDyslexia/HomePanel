@@ -1,5 +1,5 @@
 {
-  "name": "home-assistant-widget",
+  "name": "homepanel",
   "version": "3.4.6",
   "main": "main.js",
   "scripts": {
@@ -35,15 +35,15 @@
   "description": "Modern desktop widget for Home Assistant with real-time updates and drag-and-drop customization",
   "repository": {
     "type": "git",
-    "url": "https://github.com/Robertg761/HA-Desktop-Widget.git"
+    "url": "https://github.com/MrDyslexia/HomePanel.git"
   },
-  "homepage": "https://github.com/Robertg761/HA-Desktop-Widget",
+  "homepage": "https://github.com/MrDyslexia/HomePanel",
   "bugs": {
-    "url": "https://github.com/Robertg761/HA-Desktop-Widget/issues"
+    "url": "https://github.com/MrDyslexia/HomePanel/issues"
   },
   "build": {
-    "productName": "HA Desktop Widget",
-    "appId": "com.github.robertg761.hadesktopwidget",
+    "productName": "HomePanel",
+    "appId": "com.homepanel.app",
     "directories": {
       "buildResources": "build",
       "output": "dist"
@@ -66,8 +66,8 @@
     "publish": [
       {
         "provider": "github",
-        "owner": "Robertg761",
-        "repo": "HA-Desktop-Widget",
+        "owner": "MrDyslexia",
+        "repo": "HomePanel",
         "releaseType": "release"
       }
     ],
@@ -98,7 +98,7 @@
       "allowToChangeInstallationDirectory": false,
       "createDesktopShortcut": "always",
       "createStartMenuShortcut": true,
-      "shortcutName": "Home Assistant Widget"
+      "shortcutName": "HomePanel"
     },
     "portable": {
       "artifactName": "${productName}-${version}-win-${arch}-Portable.${ext}"
