@@ -47,6 +47,8 @@ let themeTooltipScrollBound = false;
 let pendingPrimaryCards = null;
 let pendingDesktopPins = {};
 let pendingLayoutPreset = 'default';
+let pendingPanelMode = 'ghost';
+let pendingGhostCorner = 'top-right';
 let pendingCustomEntityIcons = {};
 let activeCustomEntityIconPickerEntityId = null;
 let customEntityIconPickerQueryByEntityId = {};
@@ -3192,6 +3194,52 @@ function applyLayoutPreset(preset) {
   }
 }
 
+function initPanelModeUI() {
+  const grid = document.getElementById('panel-mode-grid');
+  const cornerSection = document.getElementById('ghost-corner-section');
+  if (!grid) return;
+
+  pendingPanelMode = state.CONFIG?.ui?.panelMode || 'ghost';
+  pendingGhostCorner = state.CONFIG?.ui?.ghostCorner || 'top-right';
+
+  const updateCards = (mode) => {
+    grid.querySelectorAll('.panel-mode-card').forEach(card => {
+      const isActive = card.dataset.mode === mode;
+      card.classList.toggle('active', isActive);
+      card.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    });
+    if (cornerSection) cornerSection.classList.toggle('hidden', mode !== 'ghost');
+  };
+
+  const updateCornerBtns = (corner) => {
+    const cGrid = document.getElementById('ghost-corner-grid');
+    if (!cGrid) return;
+    cGrid.querySelectorAll('.ghost-corner-btn').forEach(btn => {
+      btn.classList.toggle('active', btn.dataset.corner === corner);
+    });
+  };
+
+  updateCards(pendingPanelMode);
+  updateCornerBtns(pendingGhostCorner);
+
+  grid.querySelectorAll('.panel-mode-card').forEach(card => {
+    card.addEventListener('click', () => {
+      pendingPanelMode = card.dataset.mode;
+      updateCards(pendingPanelMode);
+    });
+  });
+
+  const cGrid = document.getElementById('ghost-corner-grid');
+  if (cGrid) {
+    cGrid.querySelectorAll('.ghost-corner-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        pendingGhostCorner = btn.dataset.corner;
+        updateCornerBtns(pendingGhostCorner);
+      });
+    });
+  }
+}
+
 function initLayoutPresetsUI() {
   const grid = document.getElementById('layout-preset-grid');
   const descEl = document.getElementById('layout-preset-description');
@@ -3399,6 +3447,9 @@ async function openSettings(uiHooks) {
     // Initialize popup hotkey UI
     initializePopupHotkey();
 
+    // Initialize panel mode UI
+    initPanelModeUI();
+
     // Initialize layout presets UI
     initLayoutPresetsUI();
 
@@ -3547,6 +3598,8 @@ async function saveSettings() {
     state.CONFIG.ui.background = pendingBackground || getCurrentBackgroundTheme();
     state.CONFIG.ui.customColors = getCustomColorsForSave();
     state.CONFIG.ui.layoutPreset = pendingLayoutPreset || 'default';
+    state.CONFIG.ui.panelMode = pendingPanelMode || 'ghost';
+    state.CONFIG.ui.ghostCorner = pendingGhostCorner || 'top-right';
     setCustomThemes(state.CONFIG.ui.customColors);
 
     // Save "Start with Windows" setting
