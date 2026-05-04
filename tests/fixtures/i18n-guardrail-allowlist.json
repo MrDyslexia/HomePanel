@@ -1,4 +1,5 @@
 [
+  "index.html|html-aria|<div class=\"layout-preset-grid\" id=\"layout-preset-grid\" role=\"radiogroup\" aria-label=\"Layout presets\">",
   "index.html|html-placeholder|<input type=\"text\" id=\"profile-sync-folder-path\" class=\"form-control\" placeholder=\"Choose a synced folder...\" readonly>",
   "index.html|html-placeholder|<input type=\"password\" id=\"profile-sync-passphrase\" placeholder=\"Enter passphrase (min 4 chars)\">",
   "index.html|html-aria|aria-label=\"Theme colors\"></div>",

@@ -415,6 +415,55 @@
                             </div>
                         </div>
                     </div>
+                    <div class="personalization-section collapsed" id="layout-presets-section">
+                        <button type="button" class="section-toggle" id="layout-presets-toggle" aria-expanded="false"
+                            aria-controls="layout-presets-body">
+                            <span>Layout Presets</span>
+                            <span class="section-toggle-icon">▾</span>
+                        </button>
+                        <div id="layout-presets-body" class="section-body">
+                            <div class="form-help">Choose a panel style. Pair with window position for best results.</div>
+                            <div class="layout-preset-grid" id="layout-preset-grid" role="radiogroup" aria-label="Layout presets">
+                                <button type="button" class="layout-preset-card" data-preset="default" role="radio" aria-checked="false">
+                                    <div class="layout-preset-preview lp-default" aria-hidden="true">
+                                        <div class="lp-header"></div>
+                                        <div class="lp-body"></div>
+                                    </div>
+                                    <span class="layout-preset-name">Default</span>
+                                </button>
+                                <button type="button" class="layout-preset-card" data-preset="panel-left" role="radio" aria-checked="false">
+                                    <div class="layout-preset-preview lp-panel-left" aria-hidden="true">
+                                        <div class="lp-header"></div>
+                                        <div class="lp-body"></div>
+                                    </div>
+                                    <span class="layout-preset-name">Panel Left</span>
+                                </button>
+                                <button type="button" class="layout-preset-card" data-preset="panel-right" role="radio" aria-checked="false">
+                                    <div class="layout-preset-preview lp-panel-right" aria-hidden="true">
+                                        <div class="lp-header"></div>
+                                        <div class="lp-body"></div>
+                                    </div>
+                                    <span class="layout-preset-name">Panel Right</span>
+                                </button>
+                                <button type="button" class="layout-preset-card" data-preset="corner" role="radio" aria-checked="false">
+                                    <div class="layout-preset-preview lp-corner" aria-hidden="true">
+                                        <div class="lp-header"></div>
+                                        <div class="lp-body"></div>
+                                    </div>
+                                    <span class="layout-preset-name">Corner</span>
+                                </button>
+                                <button type="button" class="layout-preset-card" data-preset="autohide" role="radio" aria-checked="false">
+                                    <div class="layout-preset-preview lp-autohide" aria-hidden="true">
+                                        <div class="lp-header"></div>
+                                        <div class="lp-body lp-body-faded"></div>
+                                        <div class="lp-autohide-bar"></div>
+                                    </div>
+                                    <span class="layout-preset-name">Auto-hide</span>
+                                </button>
+                            </div>
+                            <div id="layout-preset-description" class="form-help layout-preset-description"></div>
+                        </div>
+                    </div>
                     <div class="personalization-section collapsed" id="primary-cards-section">
                         <button type="button" class="section-toggle" id="primary-cards-toggle" aria-expanded="false"
                             aria-controls="primary-cards-body">

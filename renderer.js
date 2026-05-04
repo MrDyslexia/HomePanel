@@ -138,6 +138,7 @@ function applyRendererConfig(nextConfig) {
   uiUtils.applyBackgroundTheme(state.CONFIG.ui?.background || 'original');
   uiUtils.applyUiPreferences(state.CONFIG.ui || {});
   uiUtils.applyWindowEffects(state.CONFIG || {});
+  settings.applyLayoutPreset(state.CONFIG.ui?.layoutPreset || 'default');
 }
 
 async function refreshLocaleBootstrap() {
@@ -775,6 +776,26 @@ async function initializeDesktopPinMode() {
   }
 }
 
+function initAutoHide() {
+  if (!document.body.classList.contains('preset-autohide')) return;
+  let hideTimer = null;
+
+  const expand = () => {
+    clearTimeout(hideTimer);
+    document.body.classList.remove('autohide-contracted');
+  };
+
+  const contract = () => {
+    hideTimer = setTimeout(() => {
+      document.body.classList.add('autohide-contracted');
+    }, 600);
+  };
+
+  document.body.addEventListener('mouseenter', expand);
+  document.body.addEventListener('mouseleave', contract);
+  contract();
+}
+
 async function init() {
   try {
     log.info('Initializing application');
@@ -815,6 +836,7 @@ async function init() {
     }
 
     applyRendererConfig(config);
+    initAutoHide();
     wireUI();
     replaceEmojiIcons();
 

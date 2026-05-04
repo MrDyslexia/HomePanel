@@ -32,6 +32,7 @@ export {
   // Connection / Status
   mdiWifi as wifiPath,
   mdiWifiOff as wifiOffPath,
+  mdiBell as bellPath,
 
   // Utility
   mdiFileDocument as fileDocumentPath,

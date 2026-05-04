@@ -223,6 +223,7 @@ describe('Renderer desktop pin waiting escape hatch', () => {
     jest.doMock('../../src/settings.js', () => ({
       __esModule: true,
       openSettings: jest.fn(),
+      applyLayoutPreset: jest.fn(),
     }));
     jest.doMock('../../src/ui-utils.js', () => mockUiUtils);
     jest.doMock('../../src/utils.js', () => ({

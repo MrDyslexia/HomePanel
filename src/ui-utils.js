@@ -1,4 +1,5 @@
 import { t } from './i18n.js';
+import { checkCirclePath, errorPath, warningPath, infoPath } from './mdi-icons.js';
 
 let lastFocusedElement = null;
 const focusTrapHandlers = new WeakMap();
@@ -440,18 +441,31 @@ function isNativeGlassPlatform() {
  * @param {string} [type='success'] - Visual variant/class to apply (e.g., 'success', 'error', 'info').
  * @param {number} [timeout=2000] - Time in milliseconds before the toast begins fading out.
  */
+const TOAST_ICONS = {
+  success: checkCirclePath,
+  error: errorPath,
+  warning: warningPath,
+  info: infoPath,
+};
+
 function showToast(message, type = 'success', timeout = 2000) {
   try {
     const container = document.getElementById('toast-container');
     if (!container) return;
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
-    toast.textContent = message;
+    const iconPath = TOAST_ICONS[type];
+    const iconHtml = iconPath
+      ? `<span class="toast-icon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${iconPath}"/></svg></span>`
+      : '';
+    toast.innerHTML = `${iconHtml}<span class="toast-message">${message}</span>`;
     container.appendChild(toast);
     setTimeout(() => {
       toast.style.opacity = '0';
       toast.style.transition = 'opacity 0.3s';
-      setTimeout(() => container.removeChild(toast), 300);
+      setTimeout(() => {
+        if (container.contains(toast)) container.removeChild(toast);
+      }, 300);
     }, timeout);
   } catch (error) {
     console.error('Error showing toast:', error);

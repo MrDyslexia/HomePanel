@@ -180,6 +180,16 @@ html {
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* ============================================
+     ICON SCALE
+     ============================================ */
+
+  --icon-xs: 14px;
+  --icon-sm: 16px;
+  --icon-md: 20px;
+  --icon-lg: 24px;
+  --icon-xl: 32px;
 }
 
 /* Light Theme (Glassmorphism) */
@@ -2839,12 +2849,27 @@ body.desktop-pin-mode .desktop-pin-drag-region::before {
 }
 
 .control-icon {
-  font-size: 18px;
+  font-size: var(--icon-md);
   margin-bottom: 2px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 18px;
+  min-height: var(--icon-md);
+  line-height: 1;
+}
+
+.entity-svg-icon {
+  display: block;
+  width: var(--icon-md);
+  height: var(--icon-md);
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.entity-emoji-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   line-height: 1;
 }
 
@@ -3174,7 +3199,6 @@ body.desktop-pin-mode .desktop-pin-drag-region::before {
 }
 
 .weather-icon {
-  font-size: 32px;
   width: 40px;
   height: 40px;
   display: flex;
@@ -5018,9 +5042,11 @@ body.desktop-pin-mode .desktop-pin-drag-region::before {
 /* All entities have consistent styling - no special active or off states */
 
 .control-icon {
-  font-size: 24px;
+  font-size: var(--icon-lg);
   width: 32px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
 }
 
@@ -6477,10 +6503,14 @@ body.desktop-pin-mode .desktop-pin-drag-region::before {
   background: var(--surface-3);
   color: var(--text-color);
   border: 1px solid var(--border-color);
+  border-left: 3px solid var(--border-color);
   border-radius: 6px;
-  padding: 12px 16px;
+  padding: 10px 14px;
   min-width: 200px;
-  text-align: center;
+  max-width: 320px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   box-shadow: var(--shadow-2);
   backdrop-filter: blur(var(--bg-blur));
   -webkit-backdrop-filter: blur(var(--bg-blur));
@@ -6488,12 +6518,50 @@ body.desktop-pin-mode .desktop-pin-drag-region::before {
   animation: toastSlide 0.3s ease;
 }
 
+.toast-icon {
+  flex-shrink: 0;
+  width: var(--icon-sm);
+  height: var(--icon-sm);
+  display: flex;
+  align-items: center;
+}
+
+.toast-message {
+  flex: 1;
+  text-align: left;
+  line-height: 1.4;
+}
+
 .toast.success {
-  border-color: rgba(129, 199, 132, 0.6);
+  border-left-color: var(--success);
+}
+
+.toast.success .toast-icon {
+  color: var(--success);
 }
 
 .toast.error {
-  border-color: rgba(244, 143, 177, 0.6);
+  border-left-color: var(--error);
+}
+
+.toast.error .toast-icon {
+  color: var(--error);
+}
+
+.toast.warning {
+  border-left-color: var(--warning);
+}
+
+.toast.warning .toast-icon {
+  color: var(--warning);
+}
+
+.toast.info {
+  border-left-color: var(--accent);
+}
+
+.toast.info .toast-icon {
+  color: var(--accent);
 }
 
 @keyframes toastSlide {
@@ -8949,4 +9017,203 @@ label.disabled {
   border: 1px solid var(--success);
   border-radius: var(--radius-md);
   margin-top: var(--space-2);
+}
+
+/* ============================================
+   LAYOUT PRESET UI (settings panel)
+   ============================================ */
+
+.layout-preset-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin: 8px 0;
+}
+
+.layout-preset-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 4px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
+  color: var(--text-secondary);
+  font-size: var(--font-size-xs);
+  text-align: center;
+}
+
+.layout-preset-card:hover {
+  border-color: var(--border-hover);
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.layout-preset-card.active,
+.layout-preset-card[aria-checked="true"] {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+  color: var(--text-primary);
+}
+
+.layout-preset-preview {
+  width: 40px;
+  height: 48px;
+  border-radius: 4px;
+  overflow: hidden;
+  background: var(--surface-3);
+  border: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+
+.lp-header {
+  height: 8px;
+  background: var(--accent-bg);
+  border-bottom: 1px solid rgba(var(--accent-rgb), 0.2);
+}
+
+.lp-body {
+  flex: 1;
+  background: var(--surface-2);
+  margin: 3px;
+  border-radius: 2px;
+}
+
+.layout-preset-name {
+  font-size: 9px;
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+/* Panel Left preview — square left edge */
+.lp-panel-left {
+  border-radius: 0 4px 4px 0;
+  border-left: none;
+}
+
+/* Panel Right preview — square right edge */
+.lp-panel-right {
+  border-radius: 4px 0 0 4px;
+  border-right: none;
+}
+
+/* Corner preview — fully rounded */
+.lp-corner {
+  border-radius: 6px;
+  width: 30px;
+  margin: 0 auto;
+}
+
+/* Auto-hide preview — faded body + accent bar */
+.lp-autohide .lp-body-faded {
+  opacity: 0.2;
+}
+
+.lp-autohide-bar {
+  position: absolute;
+  right: 0;
+  top: 4px;
+  bottom: 4px;
+  width: 3px;
+  background: var(--accent);
+  border-radius: 2px 0 0 2px;
+  opacity: 0.7;
+}
+
+.layout-preset-description {
+  min-height: 24px;
+  transition: opacity var(--transition-fast);
+}
+
+/* ============================================
+   LAYOUT PRESETS — applied to widget body
+   ============================================ */
+
+/* Panel Left — no border radius on left edges */
+body.preset-panel-left .widget-header {
+  border-radius: 0 var(--radius-lg) 0 0;
+}
+
+body.preset-panel-left .widget-content {
+  border-radius: 0 0 var(--radius-lg) 0;
+}
+
+/* Panel Right — no border radius on right edges */
+body.preset-panel-right .widget-header {
+  border-radius: var(--radius-lg) 0 0 0;
+}
+
+body.preset-panel-right .widget-content {
+  border-radius: 0 0 0 var(--radius-lg);
+}
+
+/* Corner — tighter rounded corners */
+body.preset-corner .widget-header,
+body.preset-corner .widget-content {
+  border-radius: var(--radius-xl);
+}
+
+body.preset-corner .widget-header {
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+body.preset-corner .widget-content {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+}
+
+/* ============================================
+   AUTO-HIDE PRESET
+   ============================================ */
+
+body.preset-autohide .widget-header,
+body.preset-autohide .widget-content {
+  transition:
+    opacity 0.4s var(--ease-in-out),
+    transform 0.45s var(--ease-in-out);
+  transform-origin: top right;
+  will-change: opacity, transform;
+}
+
+body.preset-autohide .widget-header {
+  border-radius: var(--radius-xl) 0 0 0;
+}
+
+body.preset-autohide .widget-content {
+  border-radius: 0 0 0 var(--radius-xl);
+}
+
+/* Contracted state — nearly invisible, collapsed toward top-right */
+body.preset-autohide.autohide-contracted .widget-header,
+body.preset-autohide.autohide-contracted .widget-content {
+  opacity: 0.04;
+  transform: scaleX(0.12) scaleY(0.25);
+  pointer-events: none;
+}
+
+/* Persistent peek bar — always visible so user knows where to hover */
+body.preset-autohide::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 48px;
+  background: var(--accent);
+  border-radius: 0 0 0 4px;
+  opacity: 0.45;
+  transition: opacity 0.4s var(--ease-in-out);
+  pointer-events: none;
+  z-index: var(--z-notification);
+}
+
+body.preset-autohide:not(.autohide-contracted)::after {
+  opacity: 0;
 }

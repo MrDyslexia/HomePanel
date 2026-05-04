@@ -29,6 +29,7 @@ import {
   getLocaleState,
   t,
 } from './i18n.js';
+import { bellPath } from './mdi-icons.js';
 
 let previewState = null;
 let previewRaf = null;
@@ -45,6 +46,7 @@ let themeTooltip = null;
 let themeTooltipScrollBound = false;
 let pendingPrimaryCards = null;
 let pendingDesktopPins = {};
+let pendingLayoutPreset = 'default';
 let pendingCustomEntityIcons = {};
 let activeCustomEntityIconPickerEntityId = null;
 let customEntityIconPickerQueryByEntityId = {};
@@ -3172,6 +3174,53 @@ function bindLanguageSettingsUi() {
  * @param {Function} [uiHooks.updateMediaTile] - Fallback hook called after save to refresh media tile state.
  * @param {Function} [uiHooks.renderPrimaryCards] - Fallback hook called after save to refresh primary cards.
  */
+
+const LAYOUT_PRESET_DESCRIPTIONS = {
+  default: 'Standard floating widget — works anywhere on screen.',
+  'panel-left': 'Flat left edge — place the widget at the left side of the screen.',
+  'panel-right': 'Flat right edge — place the widget at the right side of the screen.',
+  corner: 'Compact rounded widget — ideal for screen corners.',
+  autohide: 'Fades out when idle, reappears on hover — subtle corner presence.',
+};
+
+const LAYOUT_PRESET_CLASSES = ['preset-default', 'preset-panel-left', 'preset-panel-right', 'preset-corner', 'preset-autohide'];
+
+function applyLayoutPreset(preset) {
+  LAYOUT_PRESET_CLASSES.forEach(cls => document.body.classList.remove(cls));
+  if (preset && preset !== 'default') {
+    document.body.classList.add(`preset-${preset}`);
+  }
+}
+
+function initLayoutPresetsUI() {
+  const grid = document.getElementById('layout-preset-grid');
+  const descEl = document.getElementById('layout-preset-description');
+  if (!grid) return;
+
+  const savedPreset = state.CONFIG?.ui?.layoutPreset || 'default';
+  pendingLayoutPreset = savedPreset;
+
+  grid.querySelectorAll('.layout-preset-card').forEach(card => {
+    const preset = card.dataset.preset;
+    const isActive = preset === savedPreset;
+    card.classList.toggle('active', isActive);
+    card.setAttribute('aria-checked', isActive ? 'true' : 'false');
+
+    card.onclick = () => {
+      pendingLayoutPreset = preset;
+      grid.querySelectorAll('.layout-preset-card').forEach(c => {
+        const isThis = c.dataset.preset === preset;
+        c.classList.toggle('active', isThis);
+        c.setAttribute('aria-checked', isThis ? 'true' : 'false');
+      });
+      if (descEl) descEl.textContent = LAYOUT_PRESET_DESCRIPTIONS[preset] || '';
+      applyLayoutPreset(preset);
+    };
+  });
+
+  if (descEl) descEl.textContent = LAYOUT_PRESET_DESCRIPTIONS[savedPreset] || '';
+}
+
 async function openSettings(uiHooks) {
   try {
     settingsUiHooks = uiHooks || null;
@@ -3350,6 +3399,9 @@ async function openSettings(uiHooks) {
     // Initialize popup hotkey UI
     initializePopupHotkey();
 
+    // Initialize layout presets UI
+    initLayoutPresetsUI();
+
     modal.classList.remove('hidden');
     modal.style.display = 'flex';
     requestAnimationFrame(() => {
@@ -3494,6 +3546,7 @@ async function saveSettings() {
     state.CONFIG.ui.accent = pendingAccent || getCurrentAccentTheme();
     state.CONFIG.ui.background = pendingBackground || getCurrentBackgroundTheme();
     state.CONFIG.ui.customColors = getCustomColorsForSave();
+    state.CONFIG.ui.layoutPreset = pendingLayoutPreset || 'default';
     setCustomThemes(state.CONFIG.ui.customColors);
 
     // Save "Start with Windows" setting
@@ -3869,10 +3922,9 @@ function populateAlertEntityPicker() {
       if (hasAlert) {
         const badge = document.createElement('span');
         badge.className = 'alert-badge';
-        badge.textContent = '🔔';
         badge.title = 'Alert configured';
         badge.style.marginLeft = '8px';
-        badge.style.fontSize = '14px';
+        badge.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${bellPath}"/></svg>`;
         item.querySelector('.entity-item-main').appendChild(badge);
       }
 
@@ -4515,4 +4567,5 @@ export {
   refreshPersonalizationSectionHeights,
   handleProfileSyncStatusUpdate,
   waitForLanguagePackRefresh,
+  applyLayoutPreset,
 };
