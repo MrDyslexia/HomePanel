@@ -5,6 +5,7 @@ import * as camera from './camera.js';
 import * as uiUtils from './ui-utils.js';
 import { formatDate, formatTime, t } from './i18n.js';
 import { setIconContent } from './icons.js';
+import { warningPath, lightbulbOnPath, lightbulbOffPath, lightbulbDimPath, heatPath, coolPath, autoModePath, dryPath, offModePath, fanOnPath } from './mdi-icons.js';
 import { normalizePrimaryCards, PRIMARY_CARD_NONE } from './primary-cards.js';
 import desktopPinSupport from './desktop-pin-support.cjs';
 import Sortable from 'sortablejs';
@@ -4221,7 +4222,7 @@ function createUnavailableElement(entityId) {
     const displayName = customName || entityId.split('.')[1].replace(/_/g, ' ');
 
     div.innerHTML = `
-      <div class="control-icon unavailable-icon">⚠️</div>
+      <div class="control-icon unavailable-icon"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${warningPath}"/></svg></div>
       <div class="control-info">
         <div class="control-name">${utils.escapeHtml(displayName)}</div>
         <div class="control-state unavailable-state">Unavailable</div>
@@ -5731,7 +5732,7 @@ function showBrightnessSlider(light) {
         <div class="modal-body">
           <div class="brightness-content">
             <div class="brightness-icon-wrapper">
-              <div class="brightness-icon" id="brightness-icon">💡</div>
+              <div class="brightness-icon" id="brightness-icon"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${lightbulbOnPath}"/></svg></div>
             </div>
             <div class="brightness-value-large" id="brightness-value-large">${currentBrightness}%</div>
             <div class="brightness-label">Brightness</div>
@@ -5803,22 +5804,23 @@ function showBrightnessSlider(light) {
     // Update icon and accent based on brightness
     const updateIconAndAccent = (value) => {
       if (!icon) return;
+      let iconPath = lightbulbOnPath;
+      let cls = 'brightness-icon brightness-max';
       if (value === 0) {
-        icon.textContent = '💤';
-        icon.className = 'brightness-icon brightness-off';
+        iconPath = lightbulbOffPath;
+        cls = 'brightness-icon brightness-off';
       } else if (value <= 25) {
-        icon.textContent = '🌑';
-        icon.className = 'brightness-icon brightness-low';
+        iconPath = lightbulbDimPath;
+        cls = 'brightness-icon brightness-low';
       } else if (value <= 50) {
-        icon.textContent = '🌓';
-        icon.className = 'brightness-icon brightness-mid';
+        iconPath = lightbulbDimPath;
+        cls = 'brightness-icon brightness-mid';
       } else if (value <= 75) {
-        icon.textContent = '🌕';
-        icon.className = 'brightness-icon brightness-high';
-      } else {
-        icon.textContent = '☀️';
-        icon.className = 'brightness-icon brightness-max';
+        iconPath = lightbulbOnPath;
+        cls = 'brightness-icon brightness-high';
       }
+      icon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${iconPath}"/></svg>`;
+      icon.className = cls;
     };
 
     // Slider behavior with debounce
@@ -5968,16 +5970,17 @@ function showClimateControls(climateEntity) {
 
     // Helper function to get mode icons
     function getModeIcon(mode) {
-      const icons = {
-        'off': '⏻',
-        'heat': '🔥',
-        'cool': '❄️',
-        'auto': '🔄',
-        'heat_cool': '🔄',
-        'fan_only': '💨',
-        'dry': '💧'
+      const paths = {
+        'off': offModePath,
+        'heat': heatPath,
+        'cool': coolPath,
+        'auto': autoModePath,
+        'heat_cool': autoModePath,
+        'fan_only': fanOnPath,
+        'dry': dryPath,
       };
-      return icons[mode] || '⚙️';
+      const p = paths[mode] || autoModePath;
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${p}"/></svg>`;
     }
 
     // Close handlers

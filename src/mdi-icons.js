@@ -34,6 +34,13 @@ export {
   mdiWifiOff as wifiOffPath,
   mdiBell as bellPath,
 
+  // Climate modes
+  mdiFire as heatPath,
+  mdiSnowflake as coolPath,
+  mdiAutorenew as autoModePath,
+  mdiWaterOff as dryPath,
+  mdiPowerOff as offModePath,
+
   // Utility
   mdiFileDocument as fileDocumentPath,
   mdiPower as powerPath,
