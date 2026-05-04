@@ -29,7 +29,7 @@ import {
   getLocaleState,
   t,
 } from './i18n.js';
-import { bellPath } from './mdi-icons.js';
+import { bellPath } from './lucide-icons.js';
 
 let previewState = null;
 let previewRaf = null;

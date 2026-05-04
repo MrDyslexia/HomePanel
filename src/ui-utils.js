@@ -1,5 +1,5 @@
 import { t } from './i18n.js';
-import { checkCirclePath, errorPath, warningPath, infoPath } from './mdi-icons.js';
+import { checkCirclePath, errorPath, warningPath, infoPath } from './lucide-icons.js';
 
 let lastFocusedElement = null;
 const focusTrapHandlers = new WeakMap();

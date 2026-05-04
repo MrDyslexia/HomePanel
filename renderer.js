@@ -10,7 +10,7 @@ import * as uiUtils from './src/ui-utils.js';
 import * as utils from './src/utils.js';
 import { setLocaleBootstrap, t, translateDocument } from './src/i18n.js';
 import { setIconContent, Icons, createIconSvgString } from './src/icons.js';
-import { musicNotePath, fileDocumentPath, weatherDefaultPath, humidityPath, weatherWindyPath } from './src/mdi-icons.js';
+import { musicNotePath, fileDocumentPath, weatherDefaultPath, humidityPath, weatherWindyPath } from './src/lucide-icons.js';
 import { BASE_RECONNECT_DELAY_MS, MAX_RECONNECT_DELAY_MS } from './src/constants.js';
 
 const CONNECTION_ERROR_TOAST_COOLDOWN_MS = 60000;
@@ -714,15 +714,12 @@ function replaceEmojiIcons() {
       setIconContent(reorganizeBtn2, 'dragHandle', { size: 18 });
     }
 
-    // Weather detail icons (humidity 💧, wind 💨)
-    document.querySelectorAll('.detail-icon').forEach(el => {
-      const txt = el.textContent.trim();
-      if (txt === '💧') {
-        el.innerHTML = createIconSvgString(humidityPath, 12);
-      } else if (txt === '💨') {
-        el.innerHTML = createIconSvgString(weatherWindyPath, 12);
-      }
-    });
+    // Weather detail icons (humidity, wind)
+    const humidityIconEl = document.getElementById('weather-humidity-icon');
+    if (humidityIconEl) humidityIconEl.innerHTML = createIconSvgString(humidityPath, 12);
+
+    const windIconEl = document.getElementById('weather-wind-icon');
+    if (windIconEl) windIconEl.innerHTML = createIconSvgString(weatherWindyPath, 12);
 
     log.info('Successfully replaced emoji icons with SVG icons');
   } catch (error) {

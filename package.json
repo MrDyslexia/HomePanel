@@ -128,6 +128,7 @@
     "electron-updater": "^6.6.2",
     "events": "^3.3.0",
     "hls.js": "^1.4.12",
+    "lucide": "^1.14.0",
     "sortablejs": "^1.15.6"
   },
   "optionalDependencies": {

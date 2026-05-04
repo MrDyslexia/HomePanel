@@ -5,23 +5,25 @@ import {
   playPath, pausePath, skipNextPath, skipPreviousPath, volumeUpPath,
   lightbulbOnPath, powerPath, brightnessPath, cameraPath, videocamPath,
   wifiPath, wifiOffPath, musicNotePath, fileDocumentPath, unknownPath,
-} from './mdi-icons.js';
+} from './lucide-icons.js';
 
-function createIcon(pathData, options = {}) {
-  const {
-    size = 24,
-    className = '',
-    color = 'currentColor',
-    ariaLabel = '',
-    title = '',
-    viewBox = '0 0 24 24',
-  } = options;
+const LUCIDE_SVG_DEFAULTS = {
+  xmlns: 'http://www.w3.org/2000/svg',
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  'stroke-width': '2',
+  'stroke-linecap': 'round',
+  'stroke-linejoin': 'round',
+};
+
+function createIcon(iconNodes, options = {}) {
+  const { size = 24, className = '', ariaLabel = '', title = '' } = options;
 
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('width', size);
-  svg.setAttribute('height', size);
-  svg.setAttribute('viewBox', viewBox);
-  svg.setAttribute('fill', color);
+  Object.entries({ ...LUCIDE_SVG_DEFAULTS, width: size, height: size }).forEach(([k, v]) => {
+    svg.setAttribute(k, String(v));
+  });
   svg.setAttribute('class', `icon ${className}`.trim());
 
   if (ariaLabel) {
@@ -32,24 +34,30 @@ function createIcon(pathData, options = {}) {
   }
 
   if (title) {
-    const titleElement = document.createElementNS('http://www.w3.org/2000/svg', 'title');
-    titleElement.textContent = title;
-    svg.appendChild(titleElement);
+    const titleEl = document.createElementNS('http://www.w3.org/2000/svg', 'title');
+    titleEl.textContent = title;
+    svg.appendChild(titleEl);
   }
 
-  const paths = Array.isArray(pathData) ? pathData : [pathData];
-  paths.forEach(d => {
-    const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-    path.setAttribute('d', d);
-    svg.appendChild(path);
+  (iconNodes || []).forEach(([tag, attrs]) => {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+    Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v));
+    svg.appendChild(el);
   });
 
   return svg;
 }
 
-// Creates an SVG string (for innerHTML insertion) from an MDI path
-function createIconSvgString(pathData, size = 20) {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="${pathData}"/></svg>`;
+function createIconSvgString(iconNodes, size = 20) {
+  const children = (iconNodes || [])
+    .map(([tag, attrs]) => {
+      const attrStr = Object.entries(attrs)
+        .map(([k, v]) => `${k}="${v}"`)
+        .join(' ');
+      return `<${tag} ${attrStr}/>`;
+    })
+    .join('');
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${children}</svg>`;
 }
 
 const Icons = {

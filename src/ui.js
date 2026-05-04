@@ -5,7 +5,7 @@ import * as camera from './camera.js';
 import * as uiUtils from './ui-utils.js';
 import { formatDate, formatTime, t } from './i18n.js';
 import { setIconContent } from './icons.js';
-import { warningPath, lightbulbOnPath, lightbulbOffPath, lightbulbDimPath, heatPath, coolPath, autoModePath, dryPath, offModePath, fanOnPath } from './mdi-icons.js';
+import { warningPath, lightbulbOnPath, lightbulbOffPath, lightbulbDimPath, heatPath, coolPath, autoModePath, dryPath, offModePath, fanOnPath } from './lucide-icons.js';
 import { normalizePrimaryCards, PRIMARY_CARD_NONE } from './primary-cards.js';
 import desktopPinSupport from './desktop-pin-support.cjs';
 import Sortable from 'sortablejs';

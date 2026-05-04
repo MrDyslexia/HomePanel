@@ -24,10 +24,10 @@
                 <button id="desktop-pin-focus-btn" class="control-btn desktop-pin-action desktop-pin-empty-action" data-i18n="Focus Main" data-i18n-title="Focus Main" title="Focus Main">Focus Main</button>
             </div>
         </div>
-        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-top-left" data-corner="top-left" data-i18n-title="Resize tile from top left" title="Resize tile from top left">↖</div>
-        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-top-right" data-corner="top-right" data-i18n-title="Resize tile from top right" title="Resize tile from top right">↗</div>
-        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-bottom-left" data-corner="bottom-left" data-i18n-title="Resize tile from bottom left" title="Resize tile from bottom left">↙</div>
-        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-bottom-right" data-corner="bottom-right" data-i18n-title="Resize tile from bottom right" title="Resize tile from bottom right">↘</div>
+        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-top-left" data-corner="top-left" data-i18n-title="Resize tile from top left" title="Resize tile from top left" aria-hidden="true"></div>
+        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-top-right" data-corner="top-right" data-i18n-title="Resize tile from top right" title="Resize tile from top right" aria-hidden="true"></div>
+        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-bottom-left" data-corner="bottom-left" data-i18n-title="Resize tile from bottom left" title="Resize tile from bottom left" aria-hidden="true"></div>
+        <div class="desktop-pin-resize-handle desktop-pin-resize-handle-bottom-right" data-corner="bottom-right" data-i18n-title="Resize tile from bottom right" title="Resize tile from bottom right" aria-hidden="true"></div>
     </div>
 
     <!-- Minimal header with just drag area and essential controls -->
@@ -56,11 +56,11 @@
                     </div>
                     <div class="weather-details">
                         <div class="weather-detail">
-                            <span class="detail-icon">💧</span>
+                            <span class="detail-icon" id="weather-humidity-icon" aria-hidden="true"></span>
                             <span class="detail-value" id="weather-humidity">--%</span>
                         </div>
                         <div class="weather-detail">
-                            <span class="detail-icon">💨</span>
+                            <span class="detail-icon" id="weather-wind-icon" aria-hidden="true"></span>
                             <span class="detail-value" id="weather-wind">--</span>
                         </div>
                     </div>
@@ -108,8 +108,10 @@
                 <span class="section-title" data-i18n="Quick Access">Quick Access</span>
                 <div class="section-buttons">
                     <button id="reorganize-quick-controls-btn" class="section-btn"
-                        data-i18n-title="Reorganize Quick Access" title="Reorganize Quick Access">⋮⋮</button>
-                    <button id="manage-quick-controls-btn" class="section-btn" data-i18n-title="Manage Quick Access" title="Manage Quick Access">➕</button>
+                        data-i18n-title="Reorganize Quick Access" title="Reorganize Quick Access"
+                        data-i18n-aria-label="Reorganize Quick Access" aria-label="Reorganize Quick Access"></button>
+                    <button id="manage-quick-controls-btn" class="section-btn" data-i18n-title="Manage Quick Access" title="Manage Quick Access"
+                        data-i18n-aria-label="Manage Quick Access" aria-label="Manage Quick Access"></button>
                 </div>
             </div>
             <div id="quick-controls" class="controls-grid">

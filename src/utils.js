@@ -28,7 +28,7 @@ import {
     weatherRainyPath, weatherSnowyPath, weatherThunderstormPath,
     weatherFogPath, weatherWindyPath, weatherNightPath,
     weatherSleethPath, weatherHailPath,
-} from './mdi-icons.js';
+} from './lucide-icons.js';
 const graphemeSegmenter = (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function')
     ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     : null;
