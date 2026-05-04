@@ -165,6 +165,7 @@ let isQuitting = false;
 let ghostPanelExpanded = false;
 const GHOST_HINT_SIZE = 56;
 const GHOST_CORNER_MARGIN = 20;
+const GHOST_SHADOW_MARGIN = 8; // extra window space so drop shadow is not clipped
 const IS_DEV_MODE = process.argv.includes('--dev');
 let windowStateSaveTimer = null;
 const CONFIG_SAVE_DEBOUNCE_MS = 120;
@@ -2123,8 +2124,8 @@ function getGhostExpandedBounds(corner) {
     ? electronScreen.getDisplayNearestPoint(mainWindow.getBounds())
     : electronScreen.getPrimaryDisplay();
   const { workArea } = display;
-  const w = config.ui?.ghostExpandedSize?.width  || 380;
-  const h = config.ui?.ghostExpandedSize?.height || 560;
+  const w = (config.ui?.ghostExpandedSize?.width  || 380) + GHOST_SHADOW_MARGIN * 2;
+  const h = (config.ui?.ghostExpandedSize?.height || 560) + GHOST_SHADOW_MARGIN * 2;
   const m = GHOST_CORNER_MARGIN;
   switch (corner) {
     case 'top-left':     return { x: workArea.x + m,                     y: workArea.y + m,                      width: w, height: h };
@@ -2169,6 +2170,33 @@ function expandGhostPanel() {
   if (!mainWindow.isDestroyed()) {
     mainWindow.webContents.send('ghost-panel-state', { expanded: true, corner });
   }
+}
+
+function getStripBounds() {
+  const display = mainWindow && !mainWindow.isDestroyed()
+    ? electronScreen.getDisplayNearestPoint(mainWindow.getBounds())
+    : electronScreen.getPrimaryDisplay();
+  const w = display.workArea;
+  return { x: w.x + Math.floor((w.width - 400) / 2), y: w.y + GHOST_CORNER_MARGIN, width: 400, height: 56 };
+}
+
+let stripSettingsExpanded = false;
+
+function expandStripForSettings() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (config.ui?.panelMode !== 'strip') return;
+  stripSettingsExpanded = true;
+  mainWindow.setResizable(true);
+  const corner = config.ui?.ghostCorner || 'top-right';
+  mainWindow.setBounds(getGhostExpandedBounds(corner), true);
+}
+
+function collapseStripAfterSettings() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  if (!stripSettingsExpanded) return;
+  stripSettingsExpanded = false;
+  mainWindow.setResizable(false);
+  mainWindow.setBounds(getStripBounds(), true);
 }
 
 /**
@@ -2948,6 +2976,16 @@ ipcMain.handle('set-ghost-corner', (_event, corner) => {
   if (!ghostPanelExpanded) collapseGhostPanel();
   saveConfig();
   return { ok: true, corner };
+});
+
+ipcMain.handle('expand-strip-for-settings', () => {
+  expandStripForSettings();
+  return { ok: true };
+});
+
+ipcMain.handle('collapse-strip-after-settings', () => {
+  collapseStripAfterSettings();
+  return { ok: true };
 });
 
 ipcMain.handle('focus-window', () => {

@@ -123,4 +123,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     ipcRenderer.on('ghost-panel-state', handler);
     return () => ipcRenderer.removeListener('ghost-panel-state', handler);
   },
+
+  // Control Strip — settings expand/collapse
+  expandStripForSettings: () => ipcRenderer.invoke('expand-strip-for-settings'),
+  collapseStripAfterSettings: () => ipcRenderer.invoke('collapse-strip-after-settings'),
 });

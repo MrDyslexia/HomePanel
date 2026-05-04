@@ -9336,6 +9336,39 @@ body.preset-autohide:not(.autohide-contracted)::after {
     0 0 20px 6px rgba(var(--accent-rgb), 0.5);
 }
 
+/* ============================================
+   PANEL FRAME — floating glass card
+   Wraps widget-header + widget-content.
+   Invisible by default (display:contents),
+   activated as glass card in ghost/ambient modes.
+   ============================================ */
+
+#panel-frame {
+  display: contents;
+}
+
+body.ghost-mode.ghost-expanded #panel-frame,
+body.ambient-mode #panel-frame {
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  inset: 8px;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow:
+    0 24px 64px rgba(0, 0, 0, 0.55),
+    0 8px 24px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+/* widget-content fills remaining panel-frame height */
+body.ghost-mode.ghost-expanded .widget-content,
+body.ambient-mode .widget-content {
+  flex: 1;
+  height: auto;
+  min-height: 0;
+}
+
 /* --- Ghost mode body class --- */
 
 /* Collapsed: show only hint */
@@ -9357,10 +9390,14 @@ body.ghost-mode.ghost-expanded .ghost-hint {
   display: none;
 }
 
+/* Animate the panel-frame card into view */
+body.ghost-mode.ghost-expanded #panel-frame {
+  animation: ghost-panel-fadein 220ms var(--ease-out) both;
+}
+
 body.ghost-mode.ghost-expanded .widget-header,
 body.ghost-mode.ghost-expanded .widget-content {
   display: flex;
-  animation: ghost-panel-fadein 220ms var(--ease-out) both;
 }
 
 body.ghost-mode.ghost-expanded #toast-container,
@@ -9369,7 +9406,7 @@ body.ghost-mode.ghost-expanded #loading-overlay {
   display: revert !important;
 }
 
-/* Panel content wrapper animation reset */
+/* Panel content wrapper display reset */
 body.ghost-mode.ghost-expanded .widget-content {
   display: block;
 }
@@ -9422,17 +9459,8 @@ body.ambient-mode .ghost-hint {
   display: none;
 }
 
-body.ambient-mode .widget-header,
-body.ambient-mode .widget-content {
-  display: flex;
-}
-
-body.ambient-mode .widget-content {
-  display: block;
-}
-
-/* Ambient glassmorphism */
 body.ambient-mode .widget-header {
+  display: flex;
   background: rgba(var(--frosted-bg-rgb, 18, 18, 18), 0.55);
   backdrop-filter: blur(32px) saturate(1.5);
   -webkit-backdrop-filter: blur(32px) saturate(1.5);
@@ -9440,6 +9468,7 @@ body.ambient-mode .widget-header {
 }
 
 body.ambient-mode .widget-content {
+  display: block;
   background: rgba(var(--frosted-bg-rgb, 18, 18, 18), 0.5);
   backdrop-filter: blur(28px) saturate(1.4);
   -webkit-backdrop-filter: blur(28px) saturate(1.4);

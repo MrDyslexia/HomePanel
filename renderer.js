@@ -111,6 +111,7 @@ function setDesktopPinConnectionIssue(detailMessage = '') {
 }
 
 function getSettingsUiHooks() {
+  const isStrip = document.body.classList.contains('strip-mode');
   return {
     initUpdateUI: ui.initUpdateUI,
     renderActiveTab: ui.renderActiveTab,
@@ -122,11 +123,21 @@ function getSettingsUiHooks() {
         ui.toggleReorganizeMode();
       }
     },
+    onClose: isStrip
+      ? () => { window.electronAPI.collapseStripAfterSettings?.().catch(() => {}); }
+      : undefined,
   };
 }
 
 function openSettingsModal() {
-  settings.openSettings(getSettingsUiHooks());
+  const isStrip = document.body.classList.contains('strip-mode');
+  if (isStrip && window.electronAPI.expandStripForSettings) {
+    window.electronAPI.expandStripForSettings()
+      .then(() => settings.openSettings(getSettingsUiHooks()))
+      .catch(() => settings.openSettings(getSettingsUiHooks()));
+  } else {
+    settings.openSettings(getSettingsUiHooks());
+  }
 }
 
 const PANEL_MODE_CLASSES = ['ghost-mode', 'ambient-mode', 'strip-mode'];

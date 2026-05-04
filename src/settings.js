@@ -3515,6 +3515,8 @@ function closeSettings() {
       modal.style.display = 'none';
       releaseFocusTrap(modal);
     }
+
+    settingsUiHooks?.onClose?.();
   } catch (error) {
     log.error('Error closing settings:', error);
   }
