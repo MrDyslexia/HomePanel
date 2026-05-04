@@ -5,6 +5,7 @@ node_modules/
 /dist/
 /dist-renderer/
 /out/
+/releases/
 /build/*
 !/build/icon.png
 !/build/icon.ico
