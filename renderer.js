@@ -783,6 +783,42 @@ async function initializeDesktopPinMode() {
   }
 }
 
+function initGhostPanel(config) {
+  const panelMode = config?.ui?.panelMode || 'ghost';
+  if (panelMode !== 'ghost') return;
+
+  const corner = config?.ui?.ghostCorner || 'top-right';
+  document.body.classList.add('ghost-mode');
+  document.body.dataset.ghostCorner = corner;
+
+  const hint = document.getElementById('ghost-hint');
+  if (!hint) return;
+
+  const doExpand = () => {
+    window.electronAPI.expandGhostPanel().catch(() => {});
+  };
+
+  hint.addEventListener('click', doExpand);
+  hint.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExpand(); }
+  });
+
+  // Listen for state updates from main
+  if (window.electronAPI.onGhostPanelState) {
+    window.electronAPI.onGhostPanelState(({ expanded, corner: newCorner }) => {
+      document.body.classList.toggle('ghost-expanded', expanded);
+      if (newCorner) document.body.dataset.ghostCorner = newCorner;
+    });
+  }
+
+  // Auto-collapse on window blur
+  window.addEventListener('blur', () => {
+    if (document.body.classList.contains('ghost-expanded')) {
+      window.electronAPI.collapseGhostPanel().catch(() => {});
+    }
+  });
+}
+
 function initAutoHide() {
   if (!document.body.classList.contains('preset-autohide')) return;
   let hideTimer = null;
@@ -835,6 +871,7 @@ async function init() {
           alerts: {},
         },
       });
+      initGhostPanel(config);
       wireUI();
       replaceEmojiIcons();
       uiUtils.showLoading(false);
@@ -843,6 +880,7 @@ async function init() {
     }
 
     applyRendererConfig(config);
+    initGhostPanel(config);
     initAutoHide();
     wireUI();
     replaceEmojiIcons();

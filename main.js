@@ -162,6 +162,9 @@ let mainWindow;
 let tray;
 let config;
 let isQuitting = false;
+let ghostPanelExpanded = false;
+const GHOST_HINT_SIZE = 56;
+const GHOST_CORNER_MARGIN = 20;
 const IS_DEV_MODE = process.argv.includes('--dev');
 let windowStateSaveTimer = null;
 const CONFIG_SAVE_DEBOUNCE_MS = 120;
@@ -1538,7 +1541,10 @@ function loadConfig() {
       language: 'auto',
       customColors: [],
       personalizationSectionsCollapsed: {},
-      enableInteractionDebugLogs: false
+      enableInteractionDebugLogs: false,
+      panelMode: 'ghost',
+      ghostCorner: 'top-right',
+      ghostExpandedSize: { width: 380, height: 560 },
     },
     primaryCards: ['weather', 'time'],
     desktopPins: {},
@@ -2072,6 +2078,76 @@ function applyFrostedGlass(override) {
   applyWindowEffectsToWindow(mainWindow, config, override);
 }
 
+// --- Ghost Panel helpers ---
+
+function getGhostHintBounds(corner) {
+  const display = mainWindow && !mainWindow.isDestroyed()
+    ? electronScreen.getDisplayNearestPoint(mainWindow.getBounds())
+    : electronScreen.getPrimaryDisplay();
+  const { workArea } = display;
+  const s = GHOST_HINT_SIZE;
+  const m = GHOST_CORNER_MARGIN;
+  switch (corner) {
+    case 'top-left':     return { x: workArea.x + m,                             y: workArea.y + m,                              width: s, height: s };
+    case 'bottom-left':  return { x: workArea.x + m,                             y: workArea.y + workArea.height - s - m,         width: s, height: s };
+    case 'bottom-right': return { x: workArea.x + workArea.width - s - m,         y: workArea.y + workArea.height - s - m,         width: s, height: s };
+    default:             return { x: workArea.x + workArea.width - s - m,         y: workArea.y + m,                              width: s, height: s };
+  }
+}
+
+function getGhostExpandedBounds(corner) {
+  const display = mainWindow && !mainWindow.isDestroyed()
+    ? electronScreen.getDisplayNearestPoint(mainWindow.getBounds())
+    : electronScreen.getPrimaryDisplay();
+  const { workArea } = display;
+  const w = config.ui?.ghostExpandedSize?.width  || 380;
+  const h = config.ui?.ghostExpandedSize?.height || 560;
+  const m = GHOST_CORNER_MARGIN;
+  switch (corner) {
+    case 'top-left':     return { x: workArea.x + m,                     y: workArea.y + m,                      width: w, height: h };
+    case 'bottom-left':  return { x: workArea.x + m,                     y: workArea.y + workArea.height - h - m, width: w, height: h };
+    case 'bottom-right': return { x: workArea.x + workArea.width - w - m, y: workArea.y + workArea.height - h - m, width: w, height: h };
+    default:             return { x: workArea.x + workArea.width - w - m, y: workArea.y + m,                      width: w, height: h };
+  }
+}
+
+function detectNearestCorner() {
+  if (!mainWindow || mainWindow.isDestroyed()) return 'top-right';
+  const b = mainWindow.getBounds();
+  const display = electronScreen.getDisplayNearestPoint({ x: b.x, y: b.y });
+  const { workArea } = display;
+  const cx = b.x + b.width  / 2;
+  const cy = b.y + b.height / 2;
+  const mx = workArea.x + workArea.width  / 2;
+  const my = workArea.y + workArea.height / 2;
+  if (cx < mx && cy < my)  return 'top-left';
+  if (cx >= mx && cy < my) return 'top-right';
+  if (cx < mx)             return 'bottom-left';
+  return 'bottom-right';
+}
+
+function collapseGhostPanel() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const corner = config.ui?.ghostCorner || 'top-right';
+  mainWindow.setBounds(getGhostHintBounds(corner), true);
+  ghostPanelExpanded = false;
+  mainWindow.setResizable(false);
+  if (!mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('ghost-panel-state', { expanded: false, corner });
+  }
+}
+
+function expandGhostPanel() {
+  if (!mainWindow || mainWindow.isDestroyed()) return;
+  const corner = config.ui?.ghostCorner || 'top-right';
+  mainWindow.setResizable(true);
+  mainWindow.setBounds(getGhostExpandedBounds(corner), true);
+  ghostPanelExpanded = true;
+  if (!mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('ghost-panel-state', { expanded: true, corner });
+  }
+}
+
 /**
  * Create and configure the application's main BrowserWindow.
  *
@@ -2123,6 +2199,18 @@ function createWindow() {
     }
   }
 
+  const isGhostMode = config.ui?.panelMode === 'ghost';
+  if (isGhostMode) {
+    const ghostCorner = config.ui?.ghostCorner || 'top-right';
+    const hintBounds = getGhostHintBounds(ghostCorner);
+    windowOptions.x = hintBounds.x;
+    windowOptions.y = hintBounds.y;
+    windowOptions.width = hintBounds.width;
+    windowOptions.height = hintBounds.height;
+    windowOptions.resizable = false;
+    ghostPanelExpanded = false;
+  }
+
   mainWindow = new BrowserWindow(windowOptions);
 
   // Set window opacity with failsafe
@@ -2141,8 +2229,27 @@ function createWindow() {
   const changeWin = () => {
     const bounds = mainWindow.getBounds();
 
+    if (config.ui?.panelMode === 'ghost' && !ghostPanelExpanded) {
+      // Ghost collapsed: snap to nearest corner, don't persist hint size as windowSize
+      const nearest = detectNearestCorner();
+      if (nearest !== config.ui.ghostCorner) {
+        config.ui.ghostCorner = nearest;
+      }
+      if (windowStateSaveTimer) clearTimeout(windowStateSaveTimer);
+      windowStateSaveTimer = setTimeout(() => {
+        windowStateSaveTimer = null;
+        collapseGhostPanel(); // snap to corner
+        saveConfig();
+      }, 400);
+      return;
+    }
+
     config.windowPosition = { x: bounds.x, y: bounds.y };
-    config.windowSize = { width: bounds.width, height: bounds.height };
+    if (config.ui?.panelMode === 'ghost' && ghostPanelExpanded) {
+      config.ui.ghostExpandedSize = { width: bounds.width, height: bounds.height };
+    } else {
+      config.windowSize = { width: bounds.width, height: bounds.height };
+    }
     if (windowStateSaveTimer) {
       clearTimeout(windowStateSaveTimer);
     }
@@ -2784,8 +2891,40 @@ ipcMain.handle('restart-app', () => {
 
 ipcMain.handle('minimize-window', () => {
   if (mainWindow) {
-    mainWindow.minimize();
+    if (config.ui?.panelMode === 'ghost') {
+      collapseGhostPanel();
+    } else {
+      mainWindow.minimize();
+    }
   }
+});
+
+ipcMain.handle('expand-ghost-panel', () => {
+  expandGhostPanel();
+  return { expanded: true };
+});
+
+ipcMain.handle('collapse-ghost-panel', () => {
+  collapseGhostPanel();
+  return { expanded: false };
+});
+
+ipcMain.handle('get-ghost-state', () => {
+  return {
+    expanded: ghostPanelExpanded,
+    corner: config.ui?.ghostCorner || 'top-right',
+    panelMode: config.ui?.panelMode || 'ghost',
+  };
+});
+
+ipcMain.handle('set-ghost-corner', (_event, corner) => {
+  const validCorners = ['top-right', 'top-left', 'bottom-right', 'bottom-left'];
+  if (!validCorners.includes(corner)) return { ok: false };
+  config.ui = config.ui || {};
+  config.ui.ghostCorner = corner;
+  if (!ghostPanelExpanded) collapseGhostPanel();
+  saveConfig();
+  return { ok: true, corner };
 });
 
 ipcMain.handle('focus-window', () => {

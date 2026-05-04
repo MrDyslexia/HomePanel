@@ -111,5 +111,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     const handler = (_event, data) => callback(data);
     ipcRenderer.on('desktop-pin-action-requested', handler);
     return () => ipcRenderer.removeListener('desktop-pin-action-requested', handler);
-  }
+  },
+
+  // Ghost Panel
+  expandGhostPanel: () => ipcRenderer.invoke('expand-ghost-panel'),
+  collapseGhostPanel: () => ipcRenderer.invoke('collapse-ghost-panel'),
+  getGhostState: () => ipcRenderer.invoke('get-ghost-state'),
+  setGhostCorner: (corner) => ipcRenderer.invoke('set-ghost-corner', corner),
+  onGhostPanelState: (callback) => {
+    const handler = (_event, data) => callback(data);
+    ipcRenderer.on('ghost-panel-state', handler);
+    return () => ipcRenderer.removeListener('ghost-panel-state', handler);
+  },
 });

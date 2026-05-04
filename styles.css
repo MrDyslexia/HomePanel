@@ -9225,3 +9225,161 @@ body.preset-autohide::after {
 body.preset-autohide:not(.autohide-contracted)::after {
   opacity: 0;
 }
+
+/* ============================================
+   GHOST PANEL — Theme 1
+   Window collapses to a small hint glow in corner.
+   Clicking expands the full panel.
+   ============================================ */
+
+/* --- Hint animations --- */
+
+@keyframes ghost-breathe {
+  0%, 100% {
+    opacity: 0.55;
+    transform: scale(1);
+    box-shadow:
+      0 0 12px 4px rgba(var(--accent-rgb), 0.35),
+      0 0 28px 8px rgba(var(--accent-rgb), 0.18);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.06);
+    box-shadow:
+      0 0 18px 6px rgba(var(--accent-rgb), 0.55),
+      0 0 42px 14px rgba(var(--accent-rgb), 0.28);
+  }
+}
+
+@keyframes ghost-invite {
+  0%   { transform: scale(1); }
+  30%  { transform: scale(1.18) rotate(8deg); }
+  60%  { transform: scale(1.12) rotate(-4deg); }
+  100% { transform: scale(1.15) rotate(0deg); }
+}
+
+@keyframes ghost-panel-fadein {
+  from { opacity: 0; transform: translateY(-6px) scale(0.97); }
+  to   { opacity: 1; transform: translateY(0)   scale(1); }
+}
+
+/* --- Ghost hint element --- */
+
+.ghost-hint {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  -webkit-app-region: no-drag;
+  user-select: none;
+  outline: none;
+}
+
+.ghost-hint:focus-visible {
+  outline: 2px solid rgba(var(--accent-rgb), 0.8);
+  outline-offset: 2px;
+}
+
+/* Core glowing orb */
+.ghost-hint-core {
+  position: absolute;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(var(--accent-rgb), 0.95) 0%,
+    rgba(var(--accent-rgb), 0.70) 45%,
+    rgba(var(--accent-rgb), 0.25) 100%
+  );
+  box-shadow:
+    0 0 12px 4px rgba(var(--accent-rgb), 0.4),
+    0 0 28px 8px rgba(var(--accent-rgb), 0.2);
+  animation: ghost-breathe 3.2s ease-in-out infinite;
+  transition: transform 180ms var(--ease-out), box-shadow 180ms var(--ease-out);
+}
+
+/* Outer ring */
+.ghost-hint-ring {
+  position: absolute;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(var(--accent-rgb), 0.3);
+  animation: ghost-breathe 3.2s ease-in-out infinite reverse;
+  transition: border-color 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+
+/* Hover — invite gesture */
+.ghost-hint:hover .ghost-hint-core {
+  animation: ghost-invite 0.55s var(--ease-out) forwards, ghost-breathe 3.2s ease-in-out 0.55s infinite;
+  box-shadow:
+    0 0 20px 8px rgba(var(--accent-rgb), 0.65),
+    0 0 48px 16px rgba(var(--accent-rgb), 0.35);
+}
+
+.ghost-hint:hover .ghost-hint-ring {
+  border-color: rgba(var(--accent-rgb), 0.6);
+  transform: scale(1.15);
+}
+
+/* Active (click) */
+.ghost-hint:active .ghost-hint-core {
+  transform: scale(0.9);
+  box-shadow:
+    0 0 8px 2px rgba(var(--accent-rgb), 0.8),
+    0 0 20px 6px rgba(var(--accent-rgb), 0.5);
+}
+
+/* --- Ghost mode body class --- */
+
+/* Collapsed: show only hint */
+body.ghost-mode .ghost-hint {
+  display: flex;
+}
+
+body.ghost-mode .widget-header,
+body.ghost-mode .widget-content,
+body.ghost-mode #toast-container,
+body.ghost-mode #settings-modal,
+body.ghost-mode #loading-overlay,
+body.ghost-mode .desktop-pin-app {
+  display: none !important;
+}
+
+/* Expanded: show panel, hide hint */
+body.ghost-mode.ghost-expanded .ghost-hint {
+  display: none;
+}
+
+body.ghost-mode.ghost-expanded .widget-header,
+body.ghost-mode.ghost-expanded .widget-content {
+  display: flex;
+  animation: ghost-panel-fadein 220ms var(--ease-out) both;
+}
+
+body.ghost-mode.ghost-expanded #toast-container,
+body.ghost-mode.ghost-expanded #settings-modal,
+body.ghost-mode.ghost-expanded #loading-overlay {
+  display: revert !important;
+}
+
+/* Panel content wrapper animation reset */
+body.ghost-mode.ghost-expanded .widget-content {
+  display: block;
+}
+
+/* Hint corner positions — controlled by data-corner on body */
+body[data-ghost-corner="top-left"] .ghost-hint,
+body[data-ghost-corner="top-right"] .ghost-hint,
+body[data-ghost-corner="bottom-left"] .ghost-hint,
+body[data-ghost-corner="bottom-right"] .ghost-hint {
+  /* hint fills the 56x56 window entirely — no corner offset needed here
+     as the window itself is positioned at the corner by main.js */
+  border-radius: 50%;
+}
