@@ -1062,6 +1062,29 @@ function applyMainWindowSettingSideEffects(previousConfig, nextConfig) {
     if (previousConfig?.frostedGlass !== nextConfig?.frostedGlass) {
       applyFrostedGlass();
     }
+
+    const prevMode = previousConfig?.ui?.panelMode || 'ghost';
+    const nextMode = nextConfig?.ui?.panelMode || 'ghost';
+    if (prevMode !== nextMode) {
+      ghostPanelExpanded = false;
+      if (nextMode === 'ghost') {
+        mainWindow.setResizable(false);
+        collapseGhostPanel();
+      } else {
+        mainWindow.setResizable(true);
+        const corner = nextConfig?.ui?.ghostCorner || 'top-right';
+        const expandedBounds = getGhostExpandedBounds(corner);
+        if (nextMode === 'strip') {
+          const display = electronScreen.getDisplayNearestPoint(mainWindow.getBounds());
+          const w = display.workArea;
+          mainWindow.setBounds({ x: w.x + Math.floor((w.width - 400) / 2), y: w.y + GHOST_CORNER_MARGIN, width: 400, height: 56 }, true);
+        } else {
+          mainWindow.setBounds(expandedBounds, true);
+        }
+      }
+    } else if (nextMode === 'ghost' && previousConfig?.ui?.ghostCorner !== nextConfig?.ui?.ghostCorner) {
+      if (!ghostPanelExpanded) collapseGhostPanel();
+    }
   }
 
   desktopPinWindows.forEach((window) => {

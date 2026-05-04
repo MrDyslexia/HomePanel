@@ -168,5 +168,20 @@
   "Minimize": "Minimize",
   "Long-press to configure weather": "Long-press to configure weather",
   "never": "never",
-  "Open HomePanel": "Open HomePanel"
+  "Open HomePanel": "Open HomePanel",
+  "Panel Mode": "Panel Mode",
+  "Choose how HomePanel appears on your desktop.": "Choose how HomePanel appears on your desktop.",
+  "Panel mode": "Panel mode",
+  "Ghost Panel": "Ghost Panel",
+  "Hides in corner, expands on click": "Hides in corner, expands on click",
+  "Ambient Glass": "Ambient Glass",
+  "Always visible floating panel": "Always visible floating panel",
+  "Control Strip": "Control Strip",
+  "Minimal icon bar, always visible": "Minimal icon bar, always visible",
+  "Corner Position": "Corner Position",
+  "Ghost panel corner": "Ghost panel corner",
+  "Top left": "Top left",
+  "Top right": "Top right",
+  "Bottom left": "Bottom left",
+  "Bottom right": "Bottom right"
 }

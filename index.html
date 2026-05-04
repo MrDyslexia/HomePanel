@@ -424,6 +424,63 @@
                             </div>
                         </div>
                     </div>
+                    <div class="personalization-section" id="panel-mode-section">
+                        <button type="button" class="section-toggle" id="panel-mode-toggle" aria-expanded="true"
+                            aria-controls="panel-mode-body">
+                            <span data-i18n="Panel Mode">Panel Mode</span>
+                            <span class="section-toggle-icon">▾</span>
+                        </button>
+                        <div id="panel-mode-body" class="section-body">
+                            <p class="form-help" data-i18n="Choose how HomePanel appears on your desktop.">Choose how HomePanel appears on your desktop.</p>
+                            <div class="panel-mode-grid" id="panel-mode-grid" role="radiogroup"
+                                 data-i18n-aria-label="Panel mode" aria-label="Panel mode">
+                                <button type="button" class="panel-mode-card" data-mode="ghost" role="radio" aria-checked="true">
+                                    <div class="panel-mode-preview pm-ghost" aria-hidden="true">
+                                        <div class="pm-ghost-orb"></div>
+                                    </div>
+                                    <div class="panel-mode-info">
+                                        <span class="panel-mode-name" data-i18n="Ghost Panel">Ghost Panel</span>
+                                        <span class="panel-mode-desc" data-i18n="Hides in corner, expands on click">Hides in corner, expands on click</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="panel-mode-card" data-mode="ambient" role="radio" aria-checked="false">
+                                    <div class="panel-mode-preview pm-ambient" aria-hidden="true">
+                                        <div class="pm-header"></div>
+                                        <div class="pm-body"></div>
+                                    </div>
+                                    <div class="panel-mode-info">
+                                        <span class="panel-mode-name" data-i18n="Ambient Glass">Ambient Glass</span>
+                                        <span class="panel-mode-desc" data-i18n="Always visible floating panel">Always visible floating panel</span>
+                                    </div>
+                                </button>
+                                <button type="button" class="panel-mode-card" data-mode="strip" role="radio" aria-checked="false">
+                                    <div class="panel-mode-preview pm-strip" aria-hidden="true">
+                                        <div class="pm-strip-bar">
+                                            <div class="pm-strip-btn"></div>
+                                            <div class="pm-strip-btn"></div>
+                                            <div class="pm-strip-btn"></div>
+                                            <div class="pm-strip-btn"></div>
+                                        </div>
+                                    </div>
+                                    <div class="panel-mode-info">
+                                        <span class="panel-mode-name" data-i18n="Control Strip">Control Strip</span>
+                                        <span class="panel-mode-desc" data-i18n="Minimal icon bar, always visible">Minimal icon bar, always visible</span>
+                                    </div>
+                                </button>
+                            </div>
+                            <div id="ghost-corner-section" class="ghost-corner-row hidden">
+                                <p class="form-label" data-i18n="Corner Position">Corner Position</p>
+                                <div class="ghost-corner-grid" id="ghost-corner-grid" role="radiogroup"
+                                     data-i18n-aria-label="Ghost panel corner" aria-label="Ghost panel corner">
+                                    <button type="button" class="ghost-corner-btn" data-corner="top-left" data-i18n-aria-label="Top left" aria-label="Top left">↖</button>
+                                    <button type="button" class="ghost-corner-btn" data-corner="top-right" data-i18n-aria-label="Top right" aria-label="Top right">↗</button>
+                                    <button type="button" class="ghost-corner-btn" data-corner="bottom-left" data-i18n-aria-label="Bottom left" aria-label="Bottom left">↙</button>
+                                    <button type="button" class="ghost-corner-btn" data-corner="bottom-right" data-i18n-aria-label="Bottom right" aria-label="Bottom right">↘</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="personalization-section collapsed" id="layout-presets-section">
                         <button type="button" class="section-toggle" id="layout-presets-toggle" aria-expanded="false"
                             aria-controls="layout-presets-body">

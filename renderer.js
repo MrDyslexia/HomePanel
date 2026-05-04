@@ -129,8 +129,18 @@ function openSettingsModal() {
   settings.openSettings(getSettingsUiHooks());
 }
 
+const PANEL_MODE_CLASSES = ['ghost-mode', 'ambient-mode', 'strip-mode'];
+
+function applyPanelMode(mode) {
+  PANEL_MODE_CLASSES.forEach(c => document.body.classList.remove(c));
+  if (mode === 'ghost')   document.body.classList.add('ghost-mode');
+  else if (mode === 'ambient') document.body.classList.add('ambient-mode');
+  else if (mode === 'strip')  document.body.classList.add('strip-mode');
+}
+
 function applyRendererConfig(nextConfig) {
   if (!nextConfig || !nextConfig.homeAssistant) return;
+  const prevMode = state.CONFIG?.ui?.panelMode;
   state.setConfig(nextConfig);
   uiUtils.applyTheme(state.CONFIG.ui?.theme || 'auto');
   uiUtils.setCustomThemes(state.CONFIG.ui?.customColors || []);
@@ -139,6 +149,16 @@ function applyRendererConfig(nextConfig) {
   uiUtils.applyUiPreferences(state.CONFIG.ui || {});
   uiUtils.applyWindowEffects(state.CONFIG || {});
   settings.applyLayoutPreset(state.CONFIG.ui?.layoutPreset || 'default');
+
+  const nextMode = state.CONFIG.ui?.panelMode || 'ghost';
+  applyPanelMode(nextMode);
+
+  if (nextMode === 'ghost' && prevMode !== 'ghost') {
+    initGhostPanel(state.CONFIG);
+  } else if (nextMode === 'ghost') {
+    const corner = state.CONFIG.ui?.ghostCorner || 'top-right';
+    document.body.dataset.ghostCorner = corner;
+  }
 }
 
 async function refreshLocaleBootstrap() {
