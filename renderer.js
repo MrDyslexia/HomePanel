@@ -180,6 +180,7 @@ function renderCurrentMode() {
     return;
   }
   ui.renderActiveTab();
+  renderStripEntities();
 }
 
 async function handleDesktopPinUpdate(message = {}) {
@@ -439,6 +440,7 @@ websocket.on('message', (msg) => {
         } else if (ui.isEntityVisible(entity.entity_id)) {
           ui.updateEntityInUI(entity);
         }
+        updateStripEntityState(entity.entity_id);
         alerts.checkEntityAlerts(entity.entity_id, entity.state);
       }
     } else if (msg.type === 'result') {
@@ -684,6 +686,9 @@ function replaceEmojiIcons() {
     const closeBtn = document.getElementById('close-btn');
     if (closeBtn) setIconContent(closeBtn, 'close', { size: 18 });
 
+    const ghostCollapseBtn = document.getElementById('ghost-collapse-btn');
+    if (ghostCollapseBtn) setIconContent(ghostCollapseBtn, 'minimize', { size: 18 });
+
     // Quick Access Controls
     const reorganizeBtn = document.getElementById('reorganize-quick-controls-btn');
     if (reorganizeBtn) setIconContent(reorganizeBtn, 'dragHandle', { size: 18 });
@@ -818,10 +823,20 @@ function initGhostPanel(config) {
     window.electronAPI.expandGhostPanel().catch(() => {});
   };
 
+  const doCollapse = () => {
+    window.electronAPI.collapseGhostPanel().catch(() => {});
+  };
+
   hint.addEventListener('click', doExpand);
   hint.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); doExpand(); }
   });
+
+  // Ghost collapse button (visible only when expanded)
+  const collapseBtn = document.getElementById('ghost-collapse-btn');
+  if (collapseBtn) {
+    collapseBtn.addEventListener('click', doCollapse);
+  }
 
   // Listen for state updates from main
   if (window.electronAPI.onGhostPanelState) {
@@ -837,6 +852,66 @@ function initGhostPanel(config) {
       window.electronAPI.collapseGhostPanel().catch(() => {});
     }
   });
+}
+
+const STRIP_READONLY_DOMAINS = new Set(['sensor', 'binary_sensor', 'weather', 'camera', 'input_text', 'device_tracker']);
+
+function stripToggleEntity(entityId) {
+  const entity = state.STATES?.[entityId];
+  if (!entity) return;
+  const domain = entityId.split('.')[0];
+  const sd = { entity_id: entityId };
+  if (domain === 'cover') {
+    websocket.callService(domain, entity.state === 'open' ? 'close_cover' : 'open_cover', sd).catch(() => {});
+  } else if (domain === 'lock') {
+    websocket.callService(domain, entity.state === 'locked' ? 'unlock' : 'lock', sd).catch(() => {});
+  } else if (domain === 'scene' || domain === 'script') {
+    websocket.callService(domain, 'turn_on', sd).catch(() => {});
+  } else {
+    websocket.callService(domain, 'toggle', sd).catch(() => {});
+  }
+}
+
+function renderStripEntities() {
+  const container = document.getElementById('strip-entities');
+  if (!container) return;
+
+  const favorites = state.CONFIG?.favoriteEntities || [];
+
+  container.innerHTML = '';
+
+  favorites.slice(0, 12).forEach(entityId => {
+    const entity = state.STATES?.[entityId];
+    const domain = entityId.split('.')[0];
+    const isOn = entity?.state === 'on' || entity?.state === 'open' || entity?.state === 'playing' || entity?.state === 'unlocked';
+    const isReadonly = STRIP_READONLY_DOMAINS.has(domain);
+    const name = entity ? utils.getEntityDisplayName(entity) : entityId;
+
+    const btn = document.createElement('button');
+    btn.className = 'strip-entity-btn' + (isOn ? ' active' : '') + (isReadonly ? ' readonly' : '');
+    btn.dataset.entityId = entityId;
+    btn.title = name;
+    btn.setAttribute('aria-label', name);
+
+    btn.innerHTML = entity ? utils.getEntityIconSvg(entity, 18) : `<span style="font-size:10px;opacity:.6">${domain.slice(0,3)}</span>`;
+
+    if (!isReadonly) {
+      btn.addEventListener('click', () => stripToggleEntity(entityId));
+    }
+
+    container.appendChild(btn);
+  });
+}
+
+function updateStripEntityState(entityId) {
+  const container = document.getElementById('strip-entities');
+  if (!container) return;
+  const btn = container.querySelector(`.strip-entity-btn[data-entity-id="${entityId}"]`);
+  if (!btn) return;
+  const entity = state.STATES?.[entityId];
+  if (!entity) return;
+  const isOn = entity.state === 'on' || entity.state === 'open' || entity.state === 'playing' || entity.state === 'unlocked';
+  btn.classList.toggle('active', isOn);
 }
 
 function initAutoHide() {
