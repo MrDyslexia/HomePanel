@@ -1,4 +1,34 @@
 import state from './state.js';
+import {
+    lightbulbOnPath, lightbulbOffPath, lightbulbDimPath,
+    switchOnPath, switchOffPath,
+    fanOnPath, fanOffPath,
+    temperaturePath, humidityPath, batteryPath, powerSensorPath,
+    pressurePath, illuminancePath, genericSensorPath, timerPath,
+    motionOnPath, motionOffPath,
+    doorOpenPath, doorClosedPath,
+    windowOpenPath, windowClosedPath,
+    smokePath, moisturePath, garageOpenPath, garageClosedPath,
+    binarySensorOnPath, binarySensorOffPath,
+    climatePath,
+    mediaPlayerPath, mediaPlayerOffPath, tvPath,
+    cctvPath,
+    lockPath, lockOpenPath,
+    coverOpenPath, coverClosedPath,
+    homePresencePath, awayPath,
+    scenePath,
+    automationPath,
+    alarmPath,
+    vacuumPath,
+    timerOffPath,
+    inputBoolOnPath, inputBoolOffPath,
+    scriptPath, selectPath, numberPath, buttonPath, updatePath,
+    unknownPath,
+    weatherDefaultPath, weatherSunnyPath, weatherCloudyPath,
+    weatherRainyPath, weatherSnowyPath, weatherThunderstormPath,
+    weatherFogPath, weatherWindyPath, weatherNightPath,
+    weatherSleethPath, weatherHailPath,
+} from './mdi-icons.js';
 const graphemeSegmenter = (typeof Intl !== 'undefined' && typeof Intl.Segmenter === 'function')
     ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     : null;
@@ -586,10 +616,127 @@ function reconcileConfigEntityIds(config, states = state.STATES) {
     return { config: nextConfig, changed };
 }
 
+// Returns the MDI SVG path string for an entity (state-aware)
+function getEntityIconPath(entity, options = {}) {
+    try {
+        if (!entity) return unknownPath;
+        const domain = entity.entity_id.split('.')[0];
+        const entityState = entity.state;
+        const attrs = entity.attributes || {};
+        const isOn = entityState === 'on';
+
+        switch (domain) {
+            case 'light':
+                if (entityState === 'on') {
+                    return attrs.brightness && attrs.brightness < 80 ? lightbulbDimPath : lightbulbOnPath;
+                }
+                return lightbulbOffPath;
+            case 'switch':
+            case 'input_boolean':
+                return isOn ? inputBoolOnPath : inputBoolOffPath;
+            case 'fan':
+                return isOn ? fanOnPath : fanOffPath;
+            case 'sensor': {
+                const dc = attrs.device_class;
+                if (dc === 'temperature') return temperaturePath;
+                if (dc === 'humidity') return humidityPath;
+                if (dc === 'pressure') return pressurePath;
+                if (dc === 'illuminance') return illuminancePath;
+                if (dc === 'battery') return batteryPath;
+                if (dc === 'power' || dc === 'energy') return powerSensorPath;
+                if (dc === 'smoke') return smokePath;
+                if (attrs.finishes_at || attrs.end_time || attrs.finish_time ||
+                    attrs.duration || entity.entity_id.toLowerCase().includes('timer')) return timerPath;
+                if (entity.entity_id.includes('battery')) return batteryPath;
+                if (entity.entity_id.includes('temperature') || entity.entity_id.includes('temp')) return temperaturePath;
+                return genericSensorPath;
+            }
+            case 'binary_sensor': {
+                const dc = attrs.device_class;
+                if (dc === 'motion') return isOn ? motionOnPath : motionOffPath;
+                if (dc === 'door') return isOn ? doorOpenPath : doorClosedPath;
+                if (dc === 'window') return isOn ? windowOpenPath : windowClosedPath;
+                if (dc === 'smoke') return smokePath;
+                if (dc === 'moisture') return moisturePath;
+                if (dc === 'garage_door') return isOn ? garageOpenPath : garageClosedPath;
+                return isOn ? binarySensorOnPath : binarySensorOffPath;
+            }
+            case 'climate': return climatePath;
+            case 'media_player':
+                if (attrs.device_class === 'tv') return tvPath;
+                return entityState === 'off' || entityState === 'unavailable' ? mediaPlayerOffPath : mediaPlayerPath;
+            case 'camera': return cctvPath;
+            case 'lock': return entityState === 'locked' ? lockPath : lockOpenPath;
+            case 'cover': return entityState === 'open' ? coverOpenPath : coverClosedPath;
+            case 'person':
+            case 'device_tracker':
+                return entityState === 'home' ? homePresencePath : awayPath;
+            case 'scene': return scenePath;
+            case 'automation': return automationPath;
+            case 'script': return scriptPath;
+            case 'alarm_control_panel': return alarmPath;
+            case 'vacuum': return vacuumPath;
+            case 'timer': return entityState === 'active' ? timerPath : timerOffPath;
+            case 'input_select':
+            case 'select': return selectPath;
+            case 'input_number':
+            case 'number': return numberPath;
+            case 'button':
+            case 'input_button': return buttonPath;
+            case 'update': return updatePath;
+            default: return unknownPath;
+        }
+    } catch (_e) {
+        return unknownPath;
+    }
+}
+
+// Returns an SVG/HTML string for direct innerHTML insertion (NOT escaped)
+// Respects custom entity icons set by user — falls back to MDI SVG when none set
+function getEntityIconSvg(entity, size = 20) {
+    if (!entity) {
+        const path = unknownPath;
+        return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="entity-svg-icon"><path d="${path}"/></svg>`;
+    }
+    // Custom icon glyphs take precedence (emoji set by user in settings)
+    const customIcon = normalizeEntityIconGlyph(state.CONFIG?.customEntityIcons?.[entity.entity_id]);
+    if (customIcon) {
+        return `<span class="entity-emoji-icon" aria-hidden="true" style="font-size:${size}px;line-height:1">${customIcon}</span>`;
+    }
+    const path = getEntityIconPath(entity);
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="entity-svg-icon"><path d="${path}"/></svg>`;
+}
+
+// Returns an SVG string for a weather condition code
+function getWeatherIconSvg(condition, size = 24) {
+    const map = {
+        'sunny': weatherSunnyPath,
+        'clear-night': weatherNightPath,
+        'cloudy': weatherCloudyPath,
+        'partlycloudy': weatherDefaultPath,
+        'rainy': weatherRainyPath,
+        'snowy': weatherSnowyPath,
+        'snowy-rainy': weatherSleethPath,
+        'hail': weatherHailPath,
+        'lightning': weatherThunderstormPath,
+        'lightning-rainy': weatherThunderstormPath,
+        'fog': weatherFogPath,
+        'windy': weatherWindyPath,
+        'windy-variant': weatherWindyPath,
+        'pouring': weatherRainyPath,
+        'exceptional': weatherDefaultPath,
+    };
+    const path = map[condition] || weatherDefaultPath;
+    return `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="weather-svg-icon"><path d="${path}"/></svg>`;
+}
+
 export {
     getEntityDisplayName,
     getEntityTypeDescription,
     getEntityIcon,
+    getEntityIconPath,
+    getEntityIconSvg,
+    getWeatherIconSvg,
     formatDuration,
     getTimerEnd,
     getSearchScore,

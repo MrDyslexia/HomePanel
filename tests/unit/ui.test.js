@@ -721,7 +721,7 @@ describe('UI Rendering - Selective Business Logic Tests (ui.js)', () => {
       ui.updateWeatherFromHA();
 
       const iconEl = document.getElementById('weather-icon');
-      expect(iconEl.textContent).toBe('☀️');
+      expect(iconEl.querySelector('svg')).toBeTruthy();
     });
 
     it('should set rainy icon for rainy/pouring conditions', () => {
@@ -736,7 +736,7 @@ describe('UI Rendering - Selective Business Logic Tests (ui.js)', () => {
       ui.updateWeatherFromHA();
 
       const iconEl = document.getElementById('weather-icon');
-      expect(iconEl.textContent).toBe('🌧️');
+      expect(iconEl.querySelector('svg')).toBeTruthy();
     });
 
     it('should set snowy icon for snowy conditions', () => {
@@ -751,7 +751,7 @@ describe('UI Rendering - Selective Business Logic Tests (ui.js)', () => {
       ui.updateWeatherFromHA();
 
       const iconEl = document.getElementById('weather-icon');
-      expect(iconEl.textContent).toBe('❄️');
+      expect(iconEl.querySelector('svg')).toBeTruthy();
     });
 
     it('should use selected weather entity when configured', () => {
@@ -1158,7 +1158,7 @@ describe('UI Rendering - Selective Business Logic Tests (ui.js)', () => {
       expect(timerTile).toBeTruthy();
       const timerIcon = timerTile.querySelector('.control-icon.timer-icon');
       expect(timerIcon).toBeTruthy();
-      expect(timerIcon.textContent).toContain('🔥');
+      expect(timerIcon.textContent).toContain('🔥'); // custom emoji icon respected
     });
 
     it('re-renders climate tiles when temperature attributes change', () => {

@@ -9,7 +9,8 @@ import * as settings from './src/settings.js';
 import * as uiUtils from './src/ui-utils.js';
 import * as utils from './src/utils.js';
 import { setLocaleBootstrap, t, translateDocument } from './src/i18n.js';
-import { setIconContent } from './src/icons.js';
+import { setIconContent, Icons, createIconSvgString } from './src/icons.js';
+import { musicNotePath, fileDocumentPath, weatherDefaultPath } from './src/mdi-icons.js';
 import { BASE_RECONNECT_DELAY_MS, MAX_RECONNECT_DELAY_MS } from './src/constants.js';
 
 const CONNECTION_ERROR_TOAST_COOLDOWN_MS = 60000;
@@ -679,13 +680,38 @@ function replaceEmojiIcons() {
     const mediaNextBtn = document.getElementById('media-tile-next');
     if (mediaNextBtn) setIconContent(mediaNextBtn, 'skipNext', { size: 20 });
 
-    // Modal Close Buttons (with × emoji)
+    // Modal Close Buttons (with × text)
     const closeButtons = document.querySelectorAll('.close-btn');
     closeButtons.forEach(btn => {
-      if (btn.textContent.includes('×')) {
+      if (btn.textContent.trim() === '×') {
         setIconContent(btn, 'close', { size: 20 });
       }
     });
+
+    // Media tile placeholder
+    const mediaTilePlaceholder = document.getElementById('media-tile-placeholder');
+    if (mediaTilePlaceholder) {
+      mediaTilePlaceholder.innerHTML = createIconSvgString(musicNotePath, 32);
+    }
+
+    // Weather icon default (shown before HA data arrives)
+    const weatherIcon = document.getElementById('weather-icon');
+    if (weatherIcon && !weatherIcon.innerHTML.trim()) {
+      weatherIcon.innerHTML = createIconSvgString(weatherDefaultPath, 32);
+    }
+
+    // View Logs button
+    const viewLogsBtn = document.getElementById('view-logs-btn');
+    if (viewLogsBtn) {
+      const iconSpan = createIconSvgString(fileDocumentPath, 16);
+      viewLogsBtn.innerHTML = `${iconSpan} View Logs`;
+    }
+
+    // Quick Access section buttons
+    const reorganizeBtn2 = document.getElementById('reorganize-quick-controls-btn');
+    if (reorganizeBtn2 && !reorganizeBtn2.querySelector('svg')) {
+      setIconContent(reorganizeBtn2, 'dragHandle', { size: 18 });
+    }
 
     log.info('Successfully replaced emoji icons with SVG icons');
   } catch (error) {

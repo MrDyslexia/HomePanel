@@ -12,7 +12,7 @@
   "index.html|html-placeholder|placeholder=\"Custom color name\" aria-label=\"Custom color name\">",
   "index.html|html-placeholder|<input type=\"text\" id=\"primary-cards-search\" placeholder=\"Search entities...\">",
   "index.html|html-placeholder|<input type=\"text\" id=\"custom-entity-icons-search\" placeholder=\"Search entities...\">",
-  "index.html|html-title|title=\"Opens the log file location in your file explorer\">📋 View Logs</button>",
+  "index.html|html-title|title=\"Opens the log file location in your file explorer\">View Logs</button>",
   "index.html|html-placeholder|<input type=\"text\" id=\"popup-hotkey-input\" placeholder=\"Not set (click Set Hotkey)\"",
   "index.html|html-placeholder|placeholder=\"Search entities to assign hotkeys...\">",
   "index.html|html-placeholder|<input type=\"text\" id=\"quick-controls-search\" placeholder=\"Search entities...\" class=\"form-control\">",

@@ -4133,7 +4133,7 @@ function createControlElement(entity) {
       div.title = `Click to toggle ${utils.getEntityDisplayName(entity)}`;
     }
 
-    const icon = utils.escapeHtml(utils.getEntityIcon(entity));
+    const icon = utils.getEntityIconSvg(entity, 20);
     const name = utils.escapeHtml(utils.getEntityDisplayName(entity));
     const state = utils.escapeHtml(utils.getEntityDisplayState(entity));
 
@@ -5224,38 +5224,8 @@ function updateWeatherFromHA() {
     // Update weather icon based on current condition
     if (iconEl) {
       const condition = weatherEntity.state?.toLowerCase() || '';
-      let icon = '🌤️'; // default
-      let classes = 'weather-icon';
-
-      if (condition.includes('sunny') || condition === 'clear') {
-        icon = '☀️';
-        classes += ' sunny';
-      } else if (condition.includes('partly') || condition.includes('cloudy')) {
-        icon = '⛅';
-        classes += ' cloudy';
-      } else if (condition.includes('rain') || condition.includes('rainy')) {
-        icon = '🌧️';
-        classes += ' rain';
-      } else if (condition.includes('snow') || condition.includes('snowy')) {
-        icon = '❄️';
-        classes += ' snow';
-      } else if (condition.includes('storm') || condition.includes('thunder') || condition.includes('lightning')) {
-        icon = '⛈️';
-        classes += ' storm';
-      } else if (condition.includes('fog') || condition.includes('mist') || condition.includes('haze')) {
-        icon = '🌫️';
-      } else if (condition.includes('wind')) {
-        icon = '💨';
-        classes += ' wind';
-      } else if (condition.includes('cloud')) {
-        icon = '☁️';
-        classes += ' cloudy';
-      } else if (condition.includes('night') || condition.includes('clear-night')) {
-        icon = '🌙';
-      }
-
-      iconEl.textContent = icon;
-      iconEl.className = classes;
+      iconEl.innerHTML = utils.getWeatherIconSvg(condition, 32);
+      iconEl.className = 'weather-icon';
     }
   } catch (error) {
     console.error('Error updating weather:', error);
