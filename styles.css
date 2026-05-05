@@ -9371,6 +9371,11 @@ body.ambient-mode .widget-content {
 
 /* --- Ghost mode body class --- */
 
+/* Collapsed: transparent window — no background square */
+body.ghost-mode:not(.ghost-expanded) {
+  background: transparent !important;
+}
+
 /* Collapsed: show only hint */
 body.ghost-mode .ghost-hint {
   display: flex;
@@ -9448,6 +9453,49 @@ body[data-ghost-corner="bottom-right"] .ghost-hint {
   /* hint fills the 56x56 window entirely — no corner offset needed here
      as the window itself is positioned at the corner by main.js */
   border-radius: 50%;
+}
+
+/* --- Orb connection state colors (ghost collapsed only) --- */
+
+@keyframes ghost-error-pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.08); }
+}
+
+/* Error / disconnected: orange orb */
+body.ghost-mode:not(.ghost-expanded)[data-connection-ok="false"] .ghost-hint-core {
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(251, 146, 60, 0.95) 0%,
+    rgba(234, 88, 12, 0.70) 45%,
+    rgba(234, 88, 12, 0.20) 100%
+  );
+  box-shadow:
+    0 0 12px 4px rgba(234, 88, 12, 0.45),
+    0 0 28px 8px rgba(234, 88, 12, 0.22);
+  animation: ghost-error-pulse 1.8s ease-in-out infinite;
+}
+
+body.ghost-mode:not(.ghost-expanded)[data-connection-ok="false"] .ghost-hint-ring {
+  border-color: rgba(234, 88, 12, 0.35);
+}
+
+/* Unconfigured: dim gray orb */
+body.ghost-mode:not(.ghost-expanded)[data-connection-ok="unconfigured"] .ghost-hint-core {
+  background: radial-gradient(
+    circle at 35% 35%,
+    rgba(148, 163, 184, 0.7) 0%,
+    rgba(100, 116, 139, 0.45) 55%,
+    rgba(100, 116, 139, 0.1) 100%
+  );
+  box-shadow:
+    0 0 8px 2px rgba(100, 116, 139, 0.25),
+    0 0 18px 5px rgba(100, 116, 139, 0.12);
+  animation: ghost-breathe 4s ease-in-out infinite;
+}
+
+body.ghost-mode:not(.ghost-expanded)[data-connection-ok="unconfigured"] .ghost-hint-ring {
+  border-color: rgba(148, 163, 184, 0.2);
 }
 
 /* ============================================

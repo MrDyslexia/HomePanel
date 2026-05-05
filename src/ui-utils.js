@@ -819,6 +819,9 @@ function initializeConnectionStatusTooltip() {
 
 function setStatus(connected, detailMessage = '') {
   try {
+    // Propagate connection state to body for ghost-mode orb color
+    document.body.dataset.connectionOk = connected ? 'true' : 'false';
+
     const status = document.getElementById('connection-status');
     if (status) {
       status.className = connected ? 'connection-indicator connected' : 'connection-indicator';

@@ -91,6 +91,10 @@ function connectWebSocket() {
   websocket.connect();
 }
 
+function setGhostOrbUnconfigured() {
+  document.body.dataset.connectionOk = 'unconfigured';
+}
+
 function setDisconnectedStatus(detailMessage = '') {
   const normalizedDetail = typeof detailMessage === 'string' ? detailMessage.trim() : '';
   if (normalizedDetail) {
@@ -962,6 +966,7 @@ async function init() {
     const config = await window.electronAPI.getConfig();
     if (!config || !config.homeAssistant) {
       log.error('Configuration is missing or invalid');
+      setGhostOrbUnconfigured();
       setDisconnectedStatus(t('Please configure connection settings (gear icon).'));
       state.setConfig({
         homeAssistant: {
@@ -1018,6 +1023,7 @@ async function init() {
 
     if (state.CONFIG.homeAssistant.token === 'YOUR_LONG_LIVED_ACCESS_TOKEN') {
       log.warn('[Init] Using default token. Please configure your Home Assistant token in settings.');
+      setGhostOrbUnconfigured();
       setDisconnectedStatus(t('Please configure your Home Assistant token in Settings (gear icon).'));
       uiUtils.showLoading(false);
       ui.renderActiveTab();
